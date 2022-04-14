@@ -8,4 +8,4 @@ This project also adheres to [Semantic Versioning](https://semver.org/).
 
 Initial version
 
-[1.0.0]: https://github.com/softrizon/nodejs-pubsub/releases/tag/v1.0.0
+[1.0.0]: https://github.com/softrizon/nestjs-pubsub/releases/tag/v1.0.0

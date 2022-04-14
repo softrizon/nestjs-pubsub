@@ -1,4 +1,4 @@
-# Pub/Sub Wrapper for Node.js
+# Pub/Sub Wrapper for NestJS
 
 [![npm version][version-img]][version-url]
 [![MIT License][license-img]][license-url]
