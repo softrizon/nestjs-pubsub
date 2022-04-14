@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Custom transport stategy wrapper for Google Cloud Pub/Sub within the NestJS framework",
   "author": "Softrizon LLC",
-  "repository": "softrizon/nodejs-pubsub",
+  "repository": "softrizon/nestjs-pubsub",
   "license": "MIT",
   "main": "./dist/src/index.js",
   "types": "./dist/src/index.d.ts",
