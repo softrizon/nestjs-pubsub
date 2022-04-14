@@ -67,7 +67,7 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
    * contains filtering info such as event type, data format, etc. and the payload
    * `data` field contains the actual information to be processed.
    */
-  async handleMessage(message: Message) {
+  protected async handleMessage(message: Message) {
     const { eventType, data, dataFormat } = this.getData(message);
 
     if (!eventType) {
