@@ -1,13 +1,13 @@
+<img src="https://i.ibb.co/rxN33YX/poweredbysoftrizon.png" alt="Softrizon Logo" title="Softfrizon" align="right"/>
+
 # Pub/Sub Wrapper for NestJS
 
 [![npm version][version-img]][version-url]
 [![MIT License][license-img]][license-url]
 
-[![N|Solid](https://i.ibb.co/rxN33YX/poweredbysoftrizon.png)](https://softrizon.com)
-
 ## Description
 
-This is a custom transport stategy wrapper for Google Cloud Pub/Sub within the
+This is a custom transport strategy wrapper for Google Cloud Pub/Sub within the
 NestJS framework. In other words, it provides a simple way to publish and
 subscribe to a topic.
 

@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { ClientConfig, Message, PubSub, Subscription } from '@google-cloud/pubsub';
-import { CustomTransportStrategy, Server, Transport } from '@nestjs/microservices';
+import { CustomTransportStrategy, MessageHandler, Server, Transport } from '@nestjs/microservices';
 import { ERROR_EVENT, MESSAGE_EVENT } from '@nestjs/microservices/constants';
 import { BaseRpcContext } from '@nestjs/microservices/ctx-host/base-rpc.context';
 
@@ -14,10 +14,13 @@ export interface PubSubServerOptions {
   noAck: boolean;
 }
 
-export interface PubSubMessage<T = any> {
-  id: string;
+export interface EventPattern {
   eventType: string;
-  dataFormat?: string;
+  dataFormat: string;
+}
+
+export interface PubSubMessage<T = any> extends EventPattern {
+  id: string;
   timestamp?: number;
   data: T;
 }
@@ -75,18 +78,27 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
       return;
     }
 
-    this.logger.log(eventType, dataFormat);
-    const messageHandler =
-      this.messageHandlers.get(eventType) ||
-      this.messageHandlers.get(`{"dataFormat":"${dataFormat}","eventType":"${eventType}"}`);
+    let handler: MessageHandler;
+    for (const [key, value] of this.getHandlers()) {
+      try {
+        const eventPattern: Partial<EventPattern> = JSON.parse(key);
 
-    if (!messageHandler) {
+        if (eventPattern?.eventType === eventType && eventPattern?.dataFormat === dataFormat) {
+          handler = value;
+          break;
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+
+    if (!handler) {
       this.logger.log(`No handlers defined for '${eventType}' have been found`);
       return;
     }
 
     const ctx = new PubSubContext([message, eventType]);
-    await messageHandler(data, ctx);
+    await handler(data, ctx);
   }
 
   protected getData(message: Message): Partial<PubSubMessage> {

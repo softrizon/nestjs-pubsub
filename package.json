@@ -1,7 +1,7 @@
 {
   "name": "@softrizon/pubsub",
-  "version": "0.1.0",
-  "description": "Custom transport stategy wrapper for Google Cloud Pub/Sub within the NestJS framework",
+  "version": "0.1.1",
+  "description": "Custom transport strategy wrapper for Google Cloud Pub/Sub within the NestJS framework",
   "author": "Softrizon LLC",
   "repository": "softrizon/nestjs-pubsub",
   "license": "MIT",
