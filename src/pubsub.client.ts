@@ -31,7 +31,8 @@ export class PubSubClient extends ClientProxy {
   }
 
   async dispatchEvent(packet: ReadPacket<any>): Promise<any> {
-    this.topic.publishMessage({ json: this.serialize(packet) }, (err) => {
+    const data = this.serialize(packet);
+    this.topic.publishMessage({ json: data.packet, attributes: data.metadata }, (err) => {
       if (err) {
         this.logger.error(err);
       }
@@ -46,15 +47,16 @@ export class PubSubClient extends ClientProxy {
   /**
    * Redecorates the packet with additional supported fields.
    */
-  protected serialize(packet: MetaPacket & ReadPacket, metadata?: any): MetaPacket & ReadPacket {
-    metadata = metadata ?? {
-      timestamp: Date.now(),
+  protected serialize(packet: MetaPacket & ReadPacket): {
+    packet: any;
+    metadata: Record<string, any>;
+  } {
+    const metadata = {
       dataFormat: packet.dataFormat ?? 'JSON_API_V1',
       eventType: packet.pattern?.toUpperCase().replaceAll('-', '_'),
     };
     delete packet.pattern; // Use `eventType` instead.
-
-    return { ...packet, ...metadata };
+    return { packet: packet.data, metadata };
   }
 
   private createClient(): PubSub {

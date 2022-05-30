@@ -19,12 +19,6 @@ export interface EventPattern {
   dataFormat: string;
 }
 
-export interface PubSubMessage<T = any> extends EventPattern {
-  id: string;
-  timestamp?: number;
-  data: T;
-}
-
 /**
  * Custom transport strategy to handle google pub/sub messages.
  */
@@ -54,9 +48,6 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
     this.subscription
       .on(MESSAGE_EVENT, async (message: Message) => {
         await this.handleMessage(message);
-        if (this.noAck) {
-          message.ack();
-        }
       })
       .on(ERROR_EVENT, (err: any) => this.logger.error(err));
 
@@ -71,7 +62,7 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
    * `data` field contains the actual information to be processed.
    */
   protected async handleMessage(message: Message) {
-    const { eventType, data, dataFormat } = this.getData(message);
+    const { eventType, dataFormat } = this.getAttributes(message);
 
     if (!eventType) {
       this.logger.log('It was not possible to obtain the pattern of the message');
@@ -98,24 +89,14 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
     }
 
     const ctx = new PubSubContext([message, eventType]);
-    await handler(data, ctx);
+    await handler(message, ctx);
   }
 
-  protected getData(message: Message): Partial<PubSubMessage> {
-    try {
-      const data = JSON.parse(message.data.toString());
-
-      return {
-        eventType: data?.eventType,
-        dataFormat: data?.dataFormat,
-        timestamp: data?.timestamp,
-        data: data?.data,
-        id: data?.id ?? message.id,
-      };
-    } catch (error) {
-      this.logger.warn('[Message.data] could not be parsed as JSON');
-      return {};
-    }
+  protected getAttributes(message: Message): Partial<EventPattern> {
+    return {
+      eventType: message?.attributes?.eventType,
+      dataFormat: message?.attributes?.dataFormat,
+    };
   }
 
   async close() {
