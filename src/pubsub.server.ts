@@ -10,8 +10,7 @@ import { BaseRpcContext } from '@nestjs/microservices/ctx-host/base-rpc.context'
 export interface PubSubServerOptions {
   config: ClientConfig;
   topic: string;
-  subscription: string;
-  noAck: boolean;
+  subscriptions: string[];
 }
 
 export interface EventPattern {
@@ -27,9 +26,8 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
   protected client: PubSub | null = null;
   protected readonly clientConfig: ClientConfig;
   protected readonly topicName: string;
-  protected readonly subscriptionName: string;
-  protected readonly noAck: boolean;
-  protected subscription: Subscription | null = null;
+  protected readonly subscriptionNames: string[];
+  protected subscriptions: Subscription[] = [];
   protected handlers = [];
   transportId?: Transport;
 
@@ -37,19 +35,22 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
     super();
     this.clientConfig = this.options.config;
     this.topicName = this.options.topic;
-    this.subscriptionName = this.options.subscription;
-    this.noAck = this.options.noAck;
+    this.subscriptionNames = this.options.subscriptions;
   }
 
   async listen(callback: (...optionalParams: unknown[]) => any) {
     this.client = this.createClient();
-    this.subscription = this.client.subscription(this.subscriptionName);
 
-    this.subscription
-      .on(MESSAGE_EVENT, async (message: Message) => {
-        await this.handleMessage(message);
-      })
-      .on(ERROR_EVENT, (err: any) => this.logger.error(err));
+    this.subscriptionNames.forEach((subscription) =>
+      this.subscriptions.push(
+        this.client
+          .subscription(subscription)
+          .on(MESSAGE_EVENT, async (message: Message) => {
+            await this.handleMessage(message);
+          })
+          .on(ERROR_EVENT, (err: any) => this.logger.error(err)),
+      ),
+    );
 
     callback();
   }
@@ -100,7 +101,9 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
   }
 
   async close() {
-    await this.subscription?.close();
+    for (const subscription of this.subscriptions) {
+      await subscription?.close();
+    }
     await this.client.close();
   }
 
