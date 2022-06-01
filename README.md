@@ -75,8 +75,7 @@ async function bootstrap() {
     strategy: new PubSubServer({
       config: { projectId: 'my-project' },
       topic: 'my-topic',
-      subscription: 'my-subscription',
-      noAck: true,
+      subscriptions: ['my-subscription'],
     }),
   });
 
