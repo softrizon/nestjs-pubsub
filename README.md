@@ -94,7 +94,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller()
 export class MessagesEventController {
-  @MessagePattern({ eventType: 'MY_PATTERN', dataFormat: 'JSON_API_V1' })
+  @MessagePattern({ event: 'MY_PATTERN', format: 'JSON_API_V1' })
   async doSomething(@Payload() data: any): Promise<void> {
     // do something with data...
   }
@@ -102,8 +102,8 @@ export class MessagesEventController {
 ```
 
 > Note: Do not forget to register the controller in the corresponding module.
-> In the example above, the message pattern is an object with the keys `eventType`
-> and `dataFormat`. This is a practice useful for filtering events in the one-to-many
+> In the example above, the message pattern is an object with the keys `event`
+> and `format`. This is a practice useful for filtering events in the one-to-many
 > pubsub architecture. If you don't need this kind of filtering, you may need to
 > extend `PubSubServer` and override the `handleMessage` and `getData` methods.
 

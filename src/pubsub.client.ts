@@ -52,10 +52,10 @@ export class PubSubClient extends ClientProxy {
     metadata: Record<string, any>;
   } {
     const metadata = {
-      dataFormat: packet.dataFormat ?? 'JSON_API_V1',
-      eventType: packet.pattern?.toUpperCase().replaceAll('-', '_'),
+      format: packet.format ?? 'JSON_API_V1',
+      event: packet.pattern?.toUpperCase().replaceAll('-', '_'),
     };
-    delete packet.pattern; // Use `eventType` instead.
+    delete packet.pattern; // Use `event` instead.
     return { packet: packet.data, metadata };
   }
 
@@ -69,6 +69,6 @@ export class PubSubClient extends ClientProxy {
  */
 interface MetaPacket {
   timestamp?: number;
-  eventType?: string;
-  dataFormat?: string;
+  event?: string;
+  format?: string;
 }

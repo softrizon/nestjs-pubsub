@@ -14,8 +14,8 @@ export interface PubSubServerOptions {
 }
 
 export interface EventPattern {
-  eventType: string;
-  dataFormat: string;
+  event: string;
+  format: string;
 }
 
 /**
@@ -63,9 +63,9 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
    * `data` field contains the actual information to be processed.
    */
   protected async handleMessage(message: Message) {
-    const { eventType, dataFormat } = this.getAttributes(message);
+    const { event, format } = this.getAttributes(message);
 
-    if (!eventType) {
+    if (!event) {
       this.logger.log('It was not possible to obtain the pattern of the message');
       return;
     }
@@ -75,7 +75,7 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
       try {
         const eventPattern: Partial<EventPattern> = JSON.parse(key);
 
-        if (eventPattern?.eventType === eventType && eventPattern?.dataFormat === dataFormat) {
+        if (eventPattern?.event === event && eventPattern?.format === format) {
           handler = value;
           break;
         }
@@ -85,18 +85,18 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
     }
 
     if (!handler) {
-      this.logger.log(`No handlers defined for '${eventType}' have been found`);
+      this.logger.log(`No handlers defined for '${event}' have been found`);
       return;
     }
 
-    const ctx = new PubSubContext([message, eventType]);
+    const ctx = new PubSubContext([message, event]);
     await handler(message, ctx);
   }
 
   protected getAttributes(message: Message): Partial<EventPattern> {
     return {
-      eventType: message?.attributes?.eventType,
-      dataFormat: message?.attributes?.dataFormat,
+      event: message?.attributes?.event,
+      format: message?.attributes?.format,
     };
   }
 
