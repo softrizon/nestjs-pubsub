@@ -45,7 +45,12 @@ export class PubSubClient extends ClientProxy {
 
   async dispatchEvent(packet: ReadPacket<any>): Promise<any> {
     const { topic, data, ...attributes } = this.serialize(packet);
-    this.getTopic(topic).publishMessage({ json: data, attributes });
+    return await this.getTopic(topic)
+      .publishMessage({ json: data, attributes })
+      .catch((error) => {
+        this.logger.error(error);
+        throw error;
+      });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
