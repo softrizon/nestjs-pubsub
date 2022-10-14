@@ -4,6 +4,9 @@ This file contains the documentation on the notable changes and bug fixes, and
 is formatted following this [standard](https://keepachangelog.com/en/1.0.0/).
 This project also adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.0] - 2022-10-14
+- Breaking change: The `emit` method takes named arguments, you can pass `topic` and `format`, and the config object has `defaultTopic` and `defaultFormat`.
+
 ## [0.1.5] - 2022-06-01
 
 - Renamed the filtering attributes:
