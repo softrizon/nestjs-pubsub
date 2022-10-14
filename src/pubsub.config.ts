@@ -1,10 +1,15 @@
 import { ClientConfig } from '@google-cloud/pubsub';
 
 export interface IPubSubConfig {
-  topicName: string;
+  defaultTopicName: string;
+  defaultFormat: string;
   config: ClientConfig;
 }
 
 export class PubSubConfig implements IPubSubConfig {
-  constructor(public topicName: string, public config: ClientConfig) {}
+  constructor(
+    public defaultTopicName: string,
+    public config: ClientConfig,
+    public defaultFormat: string,
+  ) {}
 }
