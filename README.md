@@ -33,7 +33,8 @@ import { MessageService } from './message.service';
 @Module({
   imports: [
     PubSubModule.forRoot({
-      topicName: 'my-topic',
+      defaultTopicName: 'my-topic',
+      defaultFormat: 'my-format',
       config: { projectId: 'my-project' },
     }),
   ],
@@ -53,7 +54,13 @@ export class MessageService {
   constructor(private pubsub: PubSubService) {}
 
   emit<T = any>(pattern: string, data: T): void {
-    this.pubsub.emit(pattern, data);
+    const emitOptions = {
+      event: pattern;
+      data: data;
+      topic: 'another-topic'; // optional, default: defaultTopicName
+      format: 'another-format'; // optional, default: defaultFormat
+    }
+    this.pubsub.emit(emitOptions);
   }
 }
 ```

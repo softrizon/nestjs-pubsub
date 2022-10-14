@@ -11,9 +11,9 @@ export class PubSubService implements OnModuleInit, OnModuleDestroy {
     this.client = new PubSubClient(config);
   }
 
-  emit(emitOptions: EmitOptions): void {
+  emit<T>(emitOptions: EmitOptions) {
     const { data, ...pattern } = emitOptions;
-    this.client.emit(pattern, data);
+    return this.client.emit<T>(pattern, data);
   }
 
   onModuleDestroy(): void {
