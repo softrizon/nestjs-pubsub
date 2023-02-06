@@ -46,9 +46,10 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
       this.subscriptions.push(
         this.client
           .subscription(subscription)
-          .on(MESSAGE_EVENT, (message: Message) =>
-            from(this.handleMessage(message)).pipe(first()).subscribe(),
-          )
+          .on(MESSAGE_EVENT, (message: Message) => {
+            const result = this.handleMessage(message);
+            from(result).pipe(first()).subscribe();
+          })
           .on(ERROR_EVENT, (err: any) => this.logger.error(err)),
       ),
     );
@@ -63,7 +64,7 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
    * contains filtering info such as event type, data format, etc. and the payload
    * `data` field contains the actual information to be processed.
    */
-  protected async handleMessage(message: Message) {
+  protected handleMessage(message: Message) {
     const { event, format } = this.getAttributes(message);
 
     if (!event) {
@@ -91,7 +92,8 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
     }
 
     const ctx = new PubSubContext([message, event]);
-    return await handler(message, ctx);
+
+    return handler(message, ctx);
   }
 
   protected getAttributes(message: Message): Partial<EventPattern> {
