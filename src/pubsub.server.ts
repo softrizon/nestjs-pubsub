@@ -91,7 +91,7 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
     }
 
     const ctx = new PubSubContext([message, event]);
-    await handler(message, ctx);
+    return await handler(message, ctx);
   }
 
   protected getAttributes(message: Message): Partial<EventPattern> {
