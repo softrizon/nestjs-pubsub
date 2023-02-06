@@ -3,6 +3,7 @@ import { ClientConfig, Message, PubSub, Subscription } from '@google-cloud/pubsu
 import { CustomTransportStrategy, MessageHandler, Server, Transport } from '@nestjs/microservices';
 import { ERROR_EVENT, MESSAGE_EVENT } from '@nestjs/microservices/constants';
 import { BaseRpcContext } from '@nestjs/microservices/ctx-host/base-rpc.context';
+import { first, from } from 'rxjs';
 
 /**
  * Supported server options.
@@ -45,9 +46,9 @@ export class PubSubServer extends Server implements CustomTransportStrategy {
       this.subscriptions.push(
         this.client
           .subscription(subscription)
-          .on(MESSAGE_EVENT, async (message: Message) => {
-            await this.handleMessage(message);
-          })
+          .on(MESSAGE_EVENT, (message: Message) =>
+            from(this.handleMessage(message)).pipe(first()).subscribe(),
+          )
           .on(ERROR_EVENT, (err: any) => this.logger.error(err)),
       ),
     );
